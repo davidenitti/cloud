@@ -7,21 +7,6 @@ def exe(command, do_print=True):
     else:
         os.system(command + " > /dev/null")
 
-def setup(base_res, base_dir_code, experiment_name):
-    base_dir_res = os.path.join(base_res, experiment_name)
-    if not os.path.exists(base_res):
-        os.makedirs(base_res)
-    base_dir_dataset = '/content/datasets/'
-    base_dir_res_dropbox = '/results/' + experiment_name
-    exe('pip install dropbox')
-
-    if not os.path.exists(base_dir_dataset):
-        os.makedirs(base_dir_dataset)
-    if not os.path.exists(base_dir_code):
-        os.makedirs(base_dir_code)
-    return base_dir_res, base_dir_dataset, base_dir_res_dropbox
-
-
 def init_code(dropbox_key, base_res, base_dir_code, experiment_name, dataset=None, base_dir_dataset='datasets/'):
     print('init code')
     base_dir_res = os.path.join(base_res, experiment_name)
