@@ -67,20 +67,26 @@ def start_train(dropbox_key, base_res, base_dir_code, experiment_name,
         elif program == 'cifar10':
             dataset_dropbox = None
         else:
-            raise NotImplementedError
+            dataset_dropbox = None
     dbx, callback, base_dir_res = init_code(dropbox_key, base_res, base_dir_code, experiment_name,
                                             dataset=dataset_dropbox, base_dir_dataset=base_dir_dataset)
     if program == 'autoencoders':
         import autoencoders.cnn_autoencoders as prog
     elif program == 'cifar10':
         import classification.train_cifar10 as prog
+    elif program == 'RL':
+        exe('pip install gym')
+        import RL.agent as prog
     else:
         raise NotImplementedError
-    list_args = additional_args + ['--dataset', base_dir_dataset,
-                                   '--res_dir', os.path.join(base_dir_res, 'output'),
-                                   '--checkpoint', os.path.join(base_dir_res, 'checkpoints', 'checkpoint.pth')]
+    if program == 'RL': #fixme
+        args = None
+    else:
+        list_args = additional_args + ['--dataset', base_dir_dataset,
+                                       '--res_dir', os.path.join(base_dir_res, 'output'),
+                                       '--checkpoint', os.path.join(base_dir_res, 'checkpoints', 'checkpoint.pth')]
 
-    args = prog.get_args(list_args)
-    args.net_params.update(net_params)
+        args = prog.get_args(list_args)
+        args.net_params.update(net_params)
     func_to_run = getattr(prog, func)
     func_to_run(args, callback, upload_ckp)
