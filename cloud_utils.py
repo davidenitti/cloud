@@ -75,7 +75,7 @@ def start_train(dropbox_key, base_res, base_dir_code, experiment_name,
     elif program == 'cifar10':
         import classification.train_cifar10 as prog
     elif program == 'RL':
-        exe('pip install gym')
+        exe("pip install 'gym[all]' -U")
         import RL.agent.run as prog
     else:
         raise NotImplementedError
