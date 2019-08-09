@@ -81,7 +81,7 @@ def start_train(dropbox_key, base_res, base_dir_code, experiment_name,
     else:
         raise NotImplementedError
     if program == 'RL': #fixme
-        args = additional_args
+        args = additional_args + ['--res_dir', os.path.join(base_dir_res, 'output')]
     else:
         list_args = additional_args + ['--dataset', base_dir_dataset,
                                        '--res_dir', os.path.join(base_dir_res, 'output'),
