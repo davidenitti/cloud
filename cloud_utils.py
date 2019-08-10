@@ -77,6 +77,7 @@ def start_train(dropbox_key, base_res, base_dir_code, experiment_name,
     elif program == 'RL':
         exe("pip install gym[all] -U")
         exe("pip install vel -U")
+        exe("sudo apt install ffmpeg")
         import RL.agent.run as prog
     else:
         raise NotImplementedError
