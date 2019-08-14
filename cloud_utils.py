@@ -76,7 +76,7 @@ def start_train(dropbox_key, base_res, base_dir_code, experiment_name,
         import classification.train_cifar10 as prog
     elif program == 'RL':
         exe("pip install gym[all] -U")
-        #exe("pip install gym[atari] -U")
+        exe("pip install gym[atari] -U")
         exe("pip install vel -U")
         exe("apt install ffmpeg --assume-yes")
         import RL.agent.run as prog
