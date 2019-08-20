@@ -75,7 +75,7 @@ def start_train(dropbox_key, base_res, base_dir_code, experiment_name,
     elif program == 'cifar10':
         import classification.train_cifar10 as prog
     elif program == 'RL':
-        exe('apt-get install cmake libopenmpi-dev python3-dev zlib1g-dev')
+        exe('apt-get install cmake libopenmpi-dev python3-dev zlib1g-dev --assume-yes')
         exe("pip install baselines -U")
         exe("pip install gym[all] -U")
         exe("pip install gym[atari] -U")
