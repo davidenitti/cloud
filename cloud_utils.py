@@ -70,7 +70,10 @@ def start_train(dropbox_key, base_res, base_dir_code, experiment_name,
             dataset_dropbox = None
     dbx, callback, base_dir_res = init_code(dropbox_key, base_res, base_dir_code, experiment_name,
                                             dataset=dataset_dropbox, base_dir_dataset=base_dir_dataset)
-    if program == 'autoencoders':
+    if program == 'GAN':
+        exe("pip install pytorch-lightning -U")
+        import GAN.GAN as prog
+    elif program == 'autoencoders':
         import autoencoders.cnn_autoencoders as prog
     elif program == 'cifar10':
         import classification.train_cifar10 as prog
