@@ -93,8 +93,8 @@ def start_train(dropbox_key, base_res, base_dir_code, experiment_name,
         args = additional_args + ['--res_dir', os.path.join(base_dir_res, 'output')]
     else:
         list_args = additional_args + ['--dataset', base_dir_dataset,
-                                       '--res_dir', os.path.join(base_dir_res, 'output'),
-                                       '--checkpoint', os.path.join(base_dir_res, 'checkpoints', 'checkpoint.pth')]
+                                       '--res_dir', os.path.join(base_dir_res, 'output')]
+                                       #'--checkpoint', os.path.join(base_dir_res, 'checkpoints', 'checkpoint.pth')
 
         args = prog.get_args(list_args)
         args.net_params.update(net_params)
