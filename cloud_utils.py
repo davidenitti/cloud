@@ -13,7 +13,7 @@ def init_code(dropbox_key, base_res, base_dir_code, experiment_name, dataset=Non
     if not os.path.exists(base_res):
         os.makedirs(base_res)
     base_dir_res_dropbox = '/results/' + experiment_name
-    exe('pip install dropbox=11.12.0')
+    exe('pip install dropbox==11.12.0')
 
     if not os.path.exists(base_dir_dataset):
         os.makedirs(base_dir_dataset)
