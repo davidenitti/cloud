@@ -71,10 +71,10 @@ def start_train(dropbox_key, base_res, base_dir_code, experiment_name,
     dbx, callback, base_dir_res = init_code(dropbox_key, base_res, base_dir_code, experiment_name,
                                             dataset=dataset_dropbox, base_dir_dataset=base_dir_dataset)
 
-    exe('curl https://raw.githubusercontent.com/pytorch/xla/master/contrib/scripts/env-setup.py -o pytorch-xla-env-setup.py')
-    exe('python pytorch-xla-env-setup.py --version nightly --apt-packages libomp5 libopenblas-dev')
-
     if program == 'GAN':
+        os.environ["XRT_TPU_CONFIG"] = "tpu_worker;0;10.0.0.2:8470"
+        exe('curl https://raw.githubusercontent.com/pytorch/xla/master/contrib/scripts/env-setup.py -o pytorch-xla-env-setup.py')
+        exe('python pytorch-xla-env-setup.py --apt-packages libomp5 libopenblas-dev')
         exe("pip install pytorch-lightning -U")
         import GAN.main_gan as prog
     elif program == 'autoencoders':
