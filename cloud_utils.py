@@ -72,6 +72,7 @@ def start_train(dropbox_key, base_res, base_dir_code, experiment_name,
                                             dataset=dataset_dropbox, base_dir_dataset=base_dir_dataset)
 
     if program == 'GAN':
+        exe("pip install pytorch -U")
         os.environ["XRT_TPU_CONFIG"] = "tpu_worker;0;10.0.0.2:8470"
         exe('curl https://raw.githubusercontent.com/pytorch/xla/master/contrib/scripts/env-setup.py -o pytorch-xla-env-setup.py')
         exe('python pytorch-xla-env-setup.py --apt-packages libomp5 libopenblas-dev')
