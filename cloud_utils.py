@@ -78,7 +78,7 @@ def start_train(dropbox_key, base_res, base_dir_code, experiment_name,
         import autoencoders.cnn_autoencoders as prog
     elif program == 'cifar10':
         import classification.train_cifar10 as prog
-    elif program == 'RL':
+    elif program == 'oldRL':
         exe('apt install cmake libopenmpi-dev python3-dev zlib1g-dev --assume-yes')
         exe("git clone https://github.com/openai/baselines.git /baselines ; cd /baselines ; pip install -e .")
         sys.path.append('/baselines')
@@ -87,10 +87,17 @@ def start_train(dropbox_key, base_res, base_dir_code, experiment_name,
         exe("pip install gym[atari] -U")
         exe("pip install vel -U")
         exe("apt install ffmpeg --assume-yes")
-        import RL.agent.run as prog
+        import RL.old.agent.run as prog
+    elif program == 'RL_atari':
+        exe('pip3 install gym[atari] -U')
+        exe('pip3 install gym[accept-rom-license] -U')
+        exe('git clone https://github.com/MushroomRL/mushroom-rl.git')
+        exe('cd mushroom-rl ; pip install --no-use-pep517 .[all]')
+        sys.path.append('/kaggle/working/mushroom-rl')
+        import RL.main_atari as prog
     else:
         raise NotImplementedError
-    if program == 'RL': #fixme
+    if program == 'oldRL' or program == 'RL':  #fixme
         args = additional_args + ['--res_dir', os.path.join(base_dir_res, 'output')]
     else:
         list_args = additional_args + ['--dataset', base_dir_dataset,
