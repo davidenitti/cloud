@@ -97,7 +97,7 @@ def start_train(dropbox_key, base_res, base_dir_code, experiment_name,
         import RL.main_atari as prog
     else:
         raise NotImplementedError
-    if program == 'oldRL' or program == 'RL':  #fixme
+    if 'RL' in program:
         args = additional_args + ['--res_dir', os.path.join(base_dir_res, 'output')]
     else:
         list_args = additional_args + ['--dataset', base_dir_dataset,
