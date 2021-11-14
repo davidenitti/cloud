@@ -92,7 +92,7 @@ def start_train(dropbox_key, base_res, base_dir_code, experiment_name,
         exe('pip3 install gym[atari] -U')
         exe('pip3 install gym[accept-rom-license] -U')
         exe('git clone https://github.com/MushroomRL/mushroom-rl.git')
-        exe('cd mushroom-rl ; pip install --no-use-pep517 .[all]')
+        exe('cd mushroom-rl ; pip install --no-use-pep517 .[all] -U')
         sys.path.append('/kaggle/working/mushroom-rl')
         import RL.main_atari as prog
     else:
