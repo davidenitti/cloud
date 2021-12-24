@@ -95,7 +95,7 @@ def start_train(dropbox_key, base_res, base_dir_code, experiment_name,
         exe('cd mushroom-rl ; pip install --no-use-pep517 .[all] -U')
         sys.path.append('/kaggle/working/mushroom-rl')
         exe('patch '+base_res+'/mushroom-rl/mushroom_rl/core/serialization.py '+
-                                   base_dir_code+'/code/RL/patch.patch')
+                                   base_dir_code+'/RL/patch.patch')
         import RL.main_atari as prog
     else:
         raise NotImplementedError
