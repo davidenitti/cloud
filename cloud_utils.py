@@ -72,7 +72,7 @@ def start_train(dropbox_key, base_res, base_dir_code, experiment_name,
                                             dataset=dataset_dropbox, base_dir_dataset=base_dir_dataset)
 
     if program == 'GAN':
-        exe("pip install pytorch-lightning -U")
+        #exe("pip install pytorch-lightning -U")
         import GAN.main_gan as prog
     elif program == 'autoencoders':
         import autoencoders.cnn_autoencoders as prog
