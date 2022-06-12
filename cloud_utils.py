@@ -92,8 +92,8 @@ def start_train(dropbox_key, base_res, base_dir_code, experiment_name,
         exe('pip3 install gym[atari] -U')
 
         exe('git clone https://github.com/MushroomRL/mushroom-rl.git')
-        exe('patch ' + base_res + '/mushroom-rl/mushroom_rl/core/serialization.py ' +
-            base_dir_code + '/RL/patch.patch')
+        # exe('patch ' + base_res + '/mushroom-rl/mushroom_rl/core/serialization.py ' +
+        #     base_dir_code + '/RL/patch.patch')
         exe('cd mushroom-rl ; pip install --no-use-pep517 .[all] -U')
         exe('pip3 install gym[accept-rom-license] -U')
         sys.path.append('/kaggle/working/mushroom-rl')
