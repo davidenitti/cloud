@@ -75,6 +75,8 @@ def start_train(dropbox_key, base_res, base_dir_code, experiment_name,
         #exe("pip install pytorch-lightning -U")
         import GAN.main_gan as prog
     elif program == 'superres':
+        exe('pip install -U pytorch_warmup')
+        exe('pip3 install einops')
         import diffusion.main_super_res_diff as prog
     elif program == 'autoencoders':
         import autoencoders.cnn_autoencoders as prog
