@@ -7,7 +7,8 @@ def exe(command, do_print=True):
     else:
         os.system(command + " > /dev/null")
 
-def init_code(dropbox_key, base_res, base_dir_code, experiment_name, dataset=None, base_dir_dataset='datasets/'):
+def init_code(dropbox_key, base_res, base_dir_code, experiment_name, dataset=None,
+              base_dir_dataset='datasets/'):
     print('init code')
     base_dir_res = os.path.join(base_res, experiment_name)
     if not os.path.exists(base_res):
@@ -95,12 +96,13 @@ def start_train(dropbox_key, base_res, base_dir_code, experiment_name,
         import RL.old.agent.run as prog
     elif program == 'RL_atari':
         exe('pip3 install gym[atari] -U')
-
+        exe('pip3 install gym[accept-rom-license] -U')
         exe('git clone https://github.com/MushroomRL/mushroom-rl.git')
         # exe('patch ' + base_res + '/mushroom-rl/mushroom_rl/core/serialization.py ' +
         #     base_dir_code + '/RL/patch.patch')
+
         exe('cd mushroom-rl ; pip install --no-use-pep517 .[all] -U')
-        exe('pip3 install gym[accept-rom-license] -U')
+
         sys.path.append('/kaggle/working/mushroom-rl')
 
         import RL.main_atari as prog
