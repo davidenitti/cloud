@@ -87,10 +87,10 @@ def upload(dbx, local_path, dropbox_path, overwrite=True):
     return res
 
 
-def recursive_download(dbx, local_folder, dropbox_folder, print_info=False):
+def recursive_download(dbx, local_folder, dropbox_folder, print_info=True):
     if not os.path.exists(local_folder):
         os.makedirs(local_folder)
-    exclude = ['.git', '.idea', '__pycache__','.pytest_cache','autoencoders','Sampling']
+    exclude = ['.git', '.idea', '__pycache__','.pytest_cache']
     res = list_folder(dbx, dropbox_folder)
     if res is None:
         return
