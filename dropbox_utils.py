@@ -104,21 +104,7 @@ def recursive_download(dbx, local_folder, dropbox_folder, print_info=False):
                 recursive_download(dbx, local_path_file, dropbox_path_file)
             else:
                 md = res[f]
-                to_download = False
-                if os.path.exists(local_path_file):
-                    mtime = os.path.getmtime(local_path_file)
-                    mtime_dt = datetime.datetime(*time.gmtime(mtime)[:6])
-                    size = os.path.getsize(local_path_file)
-                    if (isinstance(md, dropbox.files.FileMetadata) and
-                            mtime_dt == md.client_modified and size == md.size):  # fixme always different
-                        print(dropbox_path_file, 'is already synced [stats match]')
-                    else:
-                        # print(mtime_dt,md.client_modified,size,md.size)
-                        # print(dropbox_path_file, 'exists with different stats, downloading')
-                        to_download = True
-                else:
-                    # print(dropbox_path_file, 'does not exists, downloading')
-                    to_download = True
+                to_download = True
                 if to_download:
                     if print_info:
                         print('downloading', dropbox_path_file, 'to', local_path_file)
