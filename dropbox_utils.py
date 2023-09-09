@@ -66,6 +66,7 @@ def recursive_download(dbx, local_folder, dropbox_folder):
         printProgressBar(i, len(file_list))
         path = local_folder + remove_prefix(fn, common_dir)
         os.makedirs(os.path.dirname(os.path.abspath(path)), exist_ok=True)
+        print(path,fn)
         dbx.files_download_to_file(path, fn)
 
 
