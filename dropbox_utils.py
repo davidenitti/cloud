@@ -42,7 +42,7 @@ def recursive_download(dbx, local_folder, dropbox_folder):
     # determine highest common directory
     assert (result.entries[0].id == folder_id)
     common_dir = result.entries[0].path_display
-    local_folder = os.path.join(local_folder, os.path.basename(common_dir))
+    #local_folder = os.path.join(local_folder, os.path.basename(common_dir))
     file_list = []
 
     def process_entries(entries):
