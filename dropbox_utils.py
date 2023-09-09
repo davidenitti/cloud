@@ -1,150 +1,102 @@
-from __future__ import print_function
+# -*- coding: utf-8 -*-
+"""
+Created on Wed Mar  4 06:31:48 2020
+
+@author: hdatta
+"""
+
 import dropbox
 import os
-import datetime, time
+import shutil
 
 
-def list_folder(dbx, folder):
-    """List a folder.
+# Find folder ID
+def get_folders(dbx, folder):
+    result = dbx.files_list_folder(folder, recursive=True)
 
-    Return a dict mapping unicode filenames to
-    FileMetadata|FolderMetadata entries.
+    folders = []
+
+    def process_dirs(entries):
+        for entry in entries:
+            if isinstance(entry, dropbox.files.FolderMetadata):
+                folders.append(entry.path_lower + '--> ' + entry.id)
+
+    process_dirs(result.entries)
+
+    while result.has_more:
+        result = dbx.files_list_folder_continue(result.cursor)
+        process_dirs(result.entries)
+
+    return (folders)
+
+
+def wipe_dir(download_dir):
+    # wipe download dir
+    shutil.rmtree(download_dir)
+
+
+def recursive_download(dbx, local_folder, dropbox_folder):
+    # assert (folder_id.startswith('id:'))
+    result = dbx.files_list_folder(dropbox_folder, recursive=True)
+    folder_id = result.entries[0].id
+    # determine highest common directory
+    assert (result.entries[0].id == folder_id)
+    common_dir = result.entries[0].path_lower
+
+    file_list = []
+
+    def process_entries(entries):
+        for entry in entries:
+            if isinstance(entry, dropbox.files.FileMetadata):
+                file_list.append(entry.path_lower)
+
+    process_entries(result.entries)
+
+    while result.has_more:
+        result = dbx.files_list_folder_continue(result.cursor)
+
+        process_entries(result.entries)
+    exclude = ['.git', '.idea', '__pycache__', '.pytest_cache']
+    print('Downloading ' + str(len(file_list)) + ' files...')
+    i = 0
+    for fn in file_list:
+        if os.path.dirname(fn) in exclude:
+            continue
+        i += 1
+        printProgressBar(i, len(file_list))
+        path = local_folder + remove_prefix(fn, common_dir)
+        os.makedirs(os.path.dirname(os.path.abspath(path)), exist_ok=True)
+        dbx.files_download_to_file(path, fn)
+
+
+# auxilary function to print iterations progress (from https://stackoverflow.com/questions/3173320/text-progress-bar-in-the-console)
+def printProgressBar(iteration, total, prefix='', suffix='', decimals=1, length=100, fill='█'):
     """
-    path = '/%s' % (folder)
-    while '//' in path:
-        path = path.replace('//', '/')
-    path = path.rstrip('/')
-    try:
-        res = dbx.files_list_folder(path)
-    except dropbox.exceptions.ApiError as err:
-        print('Folder listing failed for', path, '-- assumed empty:', err)
-        return None
-    else:
-        rv = {}
-        for entry in res.entries:
-            rv[entry.name] = entry
-        return rv
-
-
-def upload2(dbx, file_path, dropbox_path, overwrite=True):
-    while '//' in dropbox_path:
-        dropbox_path = dropbox_path.replace('//', '/')
-    mode = (dropbox.files.WriteMode.overwrite
-            if overwrite
-            else dropbox.files.WriteMode.add)
-    f = open(file_path, 'rb')
-    file_size = os.path.getsize(file_path)
-
-    CHUNK_SIZE = 4 * 1024 * 1024
-
-    if file_size <= CHUNK_SIZE:
-        print(dbx.files_upload(f.read(), dropbox_path, mode, mute=True))
-    else:
-        upload_session_start_result = dbx.files_upload_session_start(f.read(CHUNK_SIZE))
-        cursor = dropbox.files.UploadSessionCursor(session_id=upload_session_start_result.session_id,
-                                                   offset=f.tell())
-        commit = dropbox.files.CommitInfo(path=dropbox_path, mode=mode)
-        i = 0
-        while f.tell() < file_size:
-            i += 1
-            if i % 30 == 0:
-                print("upload {} {}%".format(file_path, 100 * f.tell() // file_size))
-            if ((file_size - f.tell()) <= CHUNK_SIZE):
-                print(dbx.files_upload_session_finish(f.read(CHUNK_SIZE),
-                                                      cursor,
-                                                      commit))
-            else:
-                dbx.files_upload_session_append(f.read(CHUNK_SIZE),
-                                                cursor.session_id,
-                                                cursor.offset)
-                cursor.offset = f.tell()
-
-    f.close()
-
-
-def upload(dbx, local_path, dropbox_path, overwrite=True):
-    """Upload a file.
-
-    Return the request response, or None in case of error.
+    Call in a loop to create terminal progress bar
+    @params:
+        iteration   - Required  : current iteration (Int)
+        total       - Required  : total iterations (Int)
+        prefix      - Optional  : prefix string (Str)
+        suffix      - Optional  : suffix string (Str)
+        decimals    - Optional  : positive number of decimals in percent complete (Int)
+        length      - Optional  : character length of bar (Int)
+        fill        - Optional  : bar fill character (Str)
     """
-    while '//' in dropbox_path:
-        dropbox_path = dropbox_path.replace('//', '/')
-    mode = (dropbox.files.WriteMode.overwrite
-            if overwrite
-            else dropbox.files.WriteMode.add)
-    mtime = os.path.getmtime(local_path)
-    with open(local_path, 'rb') as f:
-        data = f.read()
-    try:
-        res = dbx.files_upload(
-            data, dropbox_path, mode,
-            client_modified=datetime.datetime(*time.gmtime(mtime)[:6]),
-            mute=True)
-    except dropbox.exceptions.ApiError as err:
-        print('*** API error', err)
-        return None
-    print('uploaded as', res.name.encode('utf8'))
-    return res
+    percent = ("{0:." + str(decimals) + "f}").format(100 * (iteration / float(total)))
+    filledLength = int(length * iteration // total)
+    bar = fill * filledLength + '-' * (length - filledLength)
+    print('\r%s |%s| %s%% %s' % (prefix, bar, percent, suffix), end='\r')
+    # Print New Line on Complete
+    if iteration == total:
+        print()
 
 
-def recursive_download(dbx, local_folder, dropbox_folder, print_info=True):
-    if not os.path.exists(local_folder):
-        os.makedirs(local_folder)
-    exclude = ['.git', '.idea', '__pycache__','.pytest_cache']
-    res = list_folder(dbx, dropbox_folder)
-    if res is None:
-        return
-    print('downloading', local_folder, dropbox_folder)
-    for f in res:
-        local_path_file = os.path.join(local_folder, f)
-        dropbox_path_file = os.path.join(dropbox_folder, f)
-        if f not in exclude:
-            # print(dropbox_path_file,local_path_file)
-            if isinstance(res[f], dropbox.files.FolderMetadata):
-                recursive_download(dbx, local_path_file, dropbox_path_file)
-            else:
-                md = res[f]
-                to_download = True
-                if to_download:
-                    if print_info:
-                        print('downloading', dropbox_path_file, 'to', local_path_file)
-                    dbx.files_download_to_file(local_path_file, dropbox_path_file)
+# inspired by https://stackoverflow.com/questions/16891340/remove-a-prefix-from-a-string and
+# https://stackoverflow.com/questions/1038824/how-do-i-remove-a-substring-from-the-end-of-a-string-in-python
+
+def remove_prefix(text, prefix):
+    return text[text.startswith(prefix) and len(prefix):]
 
 
-def recursive_upload(dbx, local_folder, dropbox_folder, print_info=False):
-    res = list_folder(dbx, dropbox_folder)
-    if res is None:
-        print('creating', dropbox_folder)
-        dbx.files_create_folder(dropbox_folder)
-    exclude = ['.git', '.idea', '__pycache__']
-    res = os.listdir(local_folder)
-    dropbox_list = list_folder(dbx, dropbox_folder)
-    print('uploading', local_folder, dropbox_folder)
-    for f in res:
-        local_path_file = os.path.join(local_folder, f)
-        dropbox_path_file = os.path.join(dropbox_folder, f)
-        if f not in exclude:
-            # print(dropbox_path_file,local_path_file)
-            if not os.path.isfile(local_path_file):
-                recursive_upload(dbx, local_path_file, dropbox_path_file)
-            else:
-                to_upload = False
-                if f in dropbox_list:
-                    md = dropbox_list[f]
-                    mtime = os.path.getmtime(local_path_file)
-                    mtime_dt = datetime.datetime(*time.gmtime(mtime)[:6])
-                    size = os.path.getsize(local_path_file)
-                    if (isinstance(md, dropbox.files.FileMetadata) and
-                            mtime_dt == md.client_modified and size == md.size):  # fixme always different
-                        print(dropbox_path_file, 'is already synced [stats match]')
-                    else:
-                        # print(mtime_dt,md.client_modified,size,md.size)
-                        # print(dropbox_path_file, 'exists with different stats, uploading')
-                        to_upload = True
-                else:
-                    # print(dropbox_path_file, 'does not exists, uploading')
-                    to_upload = True
-                if to_upload:
-                    if print_info:
-                        print('uploading', local_path_file, 'to', dropbox_path_file)
-                    upload2(dbx, local_path_file, dropbox_path_file)
+def remove_suffix(text, suffix):
+    return text[:-(text.endswith(suffix) and len(suffix))]
